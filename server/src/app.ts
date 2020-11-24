@@ -1,7 +1,10 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import connectDB from './config/db';
 
 dotenv.config({ path: './config/config.env' });
+
+connectDB();
 
 const app = express();
 
@@ -20,6 +23,11 @@ app.use(
 	}
 );
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
 	console.log(`Server is up and running on ${PORT}`);
+});
+
+process.on('unhandledRejection', (err: Error, promise) => {
+	console.log(`Error: ${err.message}`);
+	server.close(() => process.exit(1));
 });
