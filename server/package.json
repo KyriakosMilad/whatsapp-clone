@@ -1,0 +1,23 @@
+{
+	"name": "whatsapp-clone-backend",
+	"version": "1.0.0",
+	"description": "WhatsApp clone backend",
+	"main": "dist/app.js",
+	"author": "Kyriakos Milad",
+	"license": "GPL-3.0-only",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+	"devDependencies": {
+		"@types/express": "^4.17.9",
+		"@types/node": "^14.14.9",
+		"nodemon": "^2.0.6",
+		"typescript": "^4.1.2"
+  },
+  "scripts": {
+    "start": "tsc && node dist/app.js",
+    "watch": "nodemon dist/app.js",
+    "watch:tsc": "tsc -w",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
