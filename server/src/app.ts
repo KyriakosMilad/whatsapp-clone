@@ -1,33 +1,31 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import connectDB from './config/db';
+import errorHandler from './middlewares/errorHandler.middleware';
 
+// get config.env vars into process.env
 dotenv.config({ path: './config/config.env' });
 
+// connect to database
 connectDB();
 
 const app = express();
 
-const PORT = process.env.PORT;
+// body parser
+app.use(express.json());
 
-app.use(
-	(
-		err: Error,
-		req: express.Request,
-		res: express.Response,
-		next: express.NextFunction
-	) => {
-		res.status(500).json({
-			message: err.message,
-		});
-	}
-);
+const PORT = process.env.PORT!;
 
-const server = app.listen(PORT, () => {
+// handle error
+app.use(errorHandler);
+
+// start the server
+const server = app.listen(PORT, (): void => {
 	console.log(`Server is up and running on ${PORT}`);
 });
 
-process.on('unhandledRejection', (err: Error, promise) => {
+// handle unhandled rejection
+process.on('unhandledRejection', (err: Error) => {
 	console.log(`Error: ${err.message}`);
 	server.close(() => process.exit(1));
 });
