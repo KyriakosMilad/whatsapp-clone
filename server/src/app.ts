@@ -9,12 +9,18 @@ dotenv.config({ path: './config/config.env' });
 // connect to database
 connectDB();
 
+// routes files
+import UsersRoutes from './users/users.routes';
+
 const app = express();
 
 // body parser
 app.use(express.json());
 
 const PORT = process.env.PORT!;
+
+// mount routes
+app.use('/api', UsersRoutes);
 
 // handle error
 app.use(errorHandler);
