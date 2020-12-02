@@ -141,3 +141,32 @@ export const verifyAuthCode: RequestHandler = asyncHandler(
 		});
 	}
 );
+
+/**
+ * @desc			Check if jwt is valid
+ * @access		DEV METHOD
+ */
+export const verifyJwt = async (token: string): Promise<IUser | false> => {
+	// decode jwt
+	const decodedToken = await (<{ userId: string }>(
+		jwt.verify(token, process.env.JWT_SECRET!)
+	));
+
+	if (!decodedToken) return false;
+
+	// check if use exist with id sent in the token
+	const user = await findUserById(decodedToken.userId);
+	if (!user) return false;
+
+	return user;
+};
+
+/**
+ * @desc			Verify auth code and generate jwt
+ * @access		AUTH
+ */
+export const test: RequestHandler = asyncHandler(async (req, res, next) => {
+	res.status(200).json({
+		userId: req.user!._id.toString(),
+	});
+});
