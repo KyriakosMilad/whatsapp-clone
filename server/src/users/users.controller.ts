@@ -160,13 +160,3 @@ export const verifyJwt = async (token: string): Promise<IUser | false> => {
 
 	return user;
 };
-
-/**
- * @desc			Verify auth code and generate jwt
- * @access		AUTH
- */
-export const test: RequestHandler = asyncHandler(async (req, res, next) => {
-	res.status(200).json({
-		userId: req.user!._id.toString(),
-	});
-});
