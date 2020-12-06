@@ -5,6 +5,7 @@ import twilio from 'twilio';
 import HttpException from '../utils/HttpException';
 import jwt from 'jsonwebtoken';
 import { IUser } from './users.schema';
+import parsePhoneNumberFromString from 'libphonenumber-js';
 
 const twilioClient = twilio(
 	process.env.TWILIO_ACCOUNT_SID,
@@ -15,13 +16,12 @@ const twilioClient = twilio(
  * @desc			Create new user
  * @access		DEV METHOD
  */
-export const createUser = async (newUser: {
-	phoneNumber: string;
-	region: string;
-}): Promise<IUser | undefined> => {
+export const createUser = async (
+	phoneNumber: string
+): Promise<IUser | undefined> => {
 	try {
 		// create user
-		return await UserSchema.create(newUser);
+		return await UserSchema.create({ phoneNumber: phoneNumber });
 	} catch {
 		return undefined;
 	}
@@ -70,17 +70,21 @@ export const findUserByPhoneNumber = async (
  * @access		PUBLIC
  */
 export const signIn: RequestHandler = asyncHandler(async (req, res, next) => {
+	// parse phone number
+	const parsedPhoneNumber = parsePhoneNumberFromString(req.body.phoneNumber)!;
+
 	// get user using phone number
-	let user = await findUserByPhoneNumber(req.body.phoneNumber);
+	let user = await findUserByPhoneNumber(String(parsedPhoneNumber.number));
 
 	// check if user created before, if not create new
 	if (!user) {
-		user = await createUser(req.body);
+		user = await createUser(String(parsedPhoneNumber.number));
+		if (!user) return next(new HttpException('Server error!', 500));
 	}
 
 	// update user set auth code
 	const authCode = Math.floor(100000 + Math.random() * 900000);
-	await user!.updateOne({
+	await user.updateOne({
 		authCode: authCode,
 	});
 
@@ -114,8 +118,11 @@ export const signIn: RequestHandler = asyncHandler(async (req, res, next) => {
  */
 export const verifyAuthCode: RequestHandler = asyncHandler(
 	async (req, res, next) => {
+		// parse phone number
+		const parsedPhoneNumber = parsePhoneNumberFromString(req.body.phoneNumber)!;
+
 		// get user by phone number
-		const user = await findUserByPhoneNumber(req.body.phoneNumber);
+		const user = await findUserByPhoneNumber(String(parsedPhoneNumber.number));
 
 		// check if user exist
 		if (!user)

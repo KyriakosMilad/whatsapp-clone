@@ -2,8 +2,7 @@ import mongoose, { Document, model, Model } from 'mongoose';
 
 export interface IUser extends Document {
 	phoneNumber: string;
-	region: string;
-	authCode?: number;
+	authCode?: number | null;
 	createdAt?: Date;
 	updatedAt?: Date;
 }
@@ -15,11 +14,6 @@ const UserSchema = new mongoose.Schema(
 			unique: true,
 			required: true,
 			maxlength: 15,
-		},
-		region: {
-			type: String,
-			required: true,
-			maxlength: 3,
 		},
 		authCode: Number,
 	},
