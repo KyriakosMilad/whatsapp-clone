@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import connectDB from './config/db';
 import errorHandler from './middlewares/errorHandler.middleware';
+import authMiddleware from './middlewares/auth.middleware';
 
 // get config.env vars into process.env
 dotenv.config({ path: './config/config.env' });
@@ -11,6 +12,7 @@ connectDB();
 
 // routes files
 import UsersRoutes from './users/users.routes';
+import ContactsRoutes from './contacts/contacts.routes';
 
 const app = express();
 
@@ -21,6 +23,7 @@ const PORT = process.env.PORT!;
 
 // mount routes
 app.use('/api', UsersRoutes);
+app.use('/api/auth/contacts', authMiddleware, ContactsRoutes);
 
 // handle error
 app.use(errorHandler);
